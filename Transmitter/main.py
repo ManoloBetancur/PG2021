@@ -3,7 +3,7 @@ from machine import UART
 from machine import Pin
 import ds1302
 from micropyGPS import MicropyGPS
-
+from zone import Zone
 
 
 ds = ds1302.DS1302(Pin(9),Pin(18),Pin(19))
@@ -33,8 +33,7 @@ def convert(parts):
     data = '{0:.6f}'.format(data) # to 6 decimal places
     return str(data)
 
-def charge_time():
-    pass
+
 
 ##########################################################
 
@@ -51,11 +50,15 @@ if __name__ == '__name__':
         latitude = convert(my_gps.latitude)
         longitude = convert(my_gps.longitude)
         
+        position = (latitude,longitude)
+        
         hora = ds.hour()
         second = ds.second()
         minutes = ds.minute()
         hora_actual=f'{hora}:{minutes:02}:{second:02}'
         msg = f"{latitude},{longitude},MHX501,{hora_actual}"
-        lora.write(msg)
+        
+        if Zone(position):
+            lora.write(msg)
         utime.sleep(10)
     
